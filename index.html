@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Comando de Inteligencia - YouTube Analyzer</title>
+    <style>
+        /* --- ESTILOS CSS (DISEÑO FUTURISTA / MODO OSCURO) --- */
+        :root {
+            --bg-principal: #0b0f19;
+            --bg-tarjeta: #131c2e;
+            --borde-neon: #1e293b;
+            --texto-principal: #f8fafc;
+            --texto-secundario: #94a3b8;
+            --rojo-youtube: #ef4444;
+            --verde-exito: #10b981;
+            --oro-logro: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-principal);
+            color: var(--texto-principal);
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-bottom: 1px solid var(--borde-neon);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: var(--texto-principal);
+            letter-spacing: 1px;
+        }
+
+        header p {
+            color: var(--texto-secundario);
+            margin-top: 5px;
+        }
+
+        /* Sección de Entradas de URL */
+        .contenedor-inputs {
+            background-color: var(--bg-tarjeta);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--borde-neon);
+            max-width: 1000px;
+            margin: 0 auto 30px auto;
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-inputs { grid-template-columns: 1fr; }
+        }
+
+        .grupo-input {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grupo-input label {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--texto-secundario);
+            font-weight: 600;
+        }
+
+        .grupo-input input {
+            background-color: var(--bg-principal);
+            border: 1px solid var(--borde-neon);
+            padding: 12px;
+            border-radius: 6px;
+            color: white;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .grupo-input input:focus {
+            border-color: var(--rojo-youtube);
+        }
+
+        .btn-analizar {
+            background-color: var(--rojo-youtube);
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        .btn-analizar:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-analizar:active {
+            transform: scale(0.99);
+        }
+
+        /* Sección de Comparación Frente a Frente */
+        .pantalla-dividida {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: none; /* Se muestra al dar clic en analizar */
+        }
+
+        @media (max-width: 900px) {
+            .pantalla-dividida { grid-template-columns: 1fr; }
+        }
+
+        .columna-video {
+            background-color: var(--bg-tarjeta);
+            border-radius: 12px;
+            border: 1px solid var(--borde-neon);
+            padding: 20px;
+        }
+
+        .columna-video.competencia {
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-tipo {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .mi-video .badge-tipo { background-color: #3b82f6; }
+        .competencia .badge-tipo { background-color: var(--oro-logro); color: #000; }
+
+        .miniatura-contenedor {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 1px solid var(--borde-neon);
+        }
+
+        .miniatura-contenedor img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .titulo-video {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        /* Tarjetas de Métricas e Inteligencia */
+        .metrica-caja {
+            background-color: var(--bg-principal);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--rojo-youtube);
+        }
+
+        .metrica-caja h4 {
+            font-size: 0.85rem;
+            color: var(--texto-secundario);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .metrica-caja p {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        /* Cuadro Especial: Logro del Éxito */
+        .cuadro-logro {
+            background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%);
+            border: 1px solid var(--oro-logro);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .cuadro-logro h3 {
+            color: var(--oro-logro);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Estado de Carga */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+            color: var(--oro-logro);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>CENTRO DE COMANDO: FRENTE A FRENTE</h1>
+        <p>Auditoría de Inteligencia de Contenido y Algoritmo de YouTube</p>
+    </header>
+
+    <!-- Panel de control de URLs -->
+    <section class="contenedor-inputs">
+        <div class="grid-inputs">
+            <div class="grupo-input">
+                <label for="url-propia">URL DE TU VIDEO (Bajo Rendimiento):</label>
+                <input type="text" id="url-propia" placeholder="https://youtu.be/... o https://www.youtube.com/watch?v=...">
+            </div>
+            <div class="grupo-input">
+                <label for="url-competencia">URL DEL VIDEO VIRAL (Competencia / Éxito):</label>
+                <input type="text" id="url-competencia" placeholder="https://youtu.be/... o https://www.youtube.com/watch?v=...">
+            </div>
+        </div>
+        <button class="btn-analizar" onclick="ejecutarAnalisis()">EJECUTAR ANÁLISIS FRENTE A FRENTE</button>
+    </section>
+
+    <!-- Letrero de Carga de IA -->
+    <div id="loading-status" class="loading">
+        🤖 IA Procesando estructuras de guion, miniaturas y retención analítica...
+    </div>
+
+    <!-- Panel de Resultados Espejo -->
+    <main class="pantalla-dividida" id="panel-resultados">
+        
+        <!-- COLUMNA IZQUIERDA: TU VIDEO -->
+        <article class="columna-video mi-video">
+            <span class="badge-tipo">Tu Video</span>
+            <div class="miniatura-contenedor">
+                <img id="img-propia" src="" alt="Miniatura de tu video">
+            </div>
+            <h2 class="titulo-video" id="txt-titulo-propio">Análisis de Estructura Estándar</h2>
+            
+            <div class="metrica-caja">
+                <h4>Gancho Inicial (Primeros 30s)</h4>
+                <p>Introducción corporativa o saludo largo. Retraso en la entrega de la promesa central. El usuario promedio abandona antes del primer minuto.</p>
+            </div>
+            <div class="metrica-caja">
+                <h4>Estilo de Título e Imagen</h4>
+                <p>Título plano orientado a búsquedas lógicas (SEO plano), pero carece de urgencia emocional o curiosidad disruptiva.</p>
+            </div>
+        </article>
+
+        <!-- COLUMNA DERECHA: VIDEO VIRAL -->
+        <article class="columna-video competencia">
+            <span class="badge-tipo">Video Viral / Competencia</span>
+            <div class="miniatura-contenedor">
+                <img id="img-competencia" src="" alt="Miniatura video competencia">
+            </div>
+            <h2 class="titulo-video" id="txt-titulo-competencia">Análisis de Impacto Masivo</h2>
+            
+            <div class="metrica-caja" style="border-left-color: var(--verde-exito);">
+                <h4>Gancho Inicial (Primeros 30s)</h4>
+                <p>Ataque directo al grano con lenguaje de alto impacto o tabú. Cero rodeos. Establece una recompensa psicológica inmediata.</p>
+            </div>
+            <div class="metrica-caja" style="border-left-color: var(--verde-exito);">
+                <h4>Estilo de Título e Imagen</h4>
+                <p>Uso de contradicción o choque cultural (Ej: Una mujer explicando psicología masculina). Dispara drásticamente el CTR.</p>
+            </div>
+
+            <!-- CUADRO CLAVE DEL ÉXITO -->
+            <div class="cuadro-logro">
+                <h3>⚡ El Logro del Éxito (Disparador Núcleo)</h3>
+                <p>Este video superó las métricas estándar debido al <strong>Quiebre de Expectativa</strong> y la validación inmediata del dolor del usuario. Al generar controversia controlada en las palabras iniciales, obliga a la audiencia a interactuar en la caja de comentarios, acelerando la recomendación del algoritmo orgánico.</p>
+            </div>
+        </article>
+
+    </main>
+
+    <!-- --- LÓGICA JAVASCRIPT --- -->
+    <script>
+        // Función para extraer el ID de un video de YouTube a partir de cualquier formato de URL
+        function extraerVideoID(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function ejecutarAnalisis() {
+            const urlPropia = document.getElementById('url-propia').value;
+            const urlCompetencia = document.getElementById('url-competencia').value;
+
+            if (!urlPropia || !urlCompetencia) {
+                alert("Por favor, introduce ambas URLs de YouTube para realizar el Frente a Frente.");
+                return;
+            }
+
+            const idPropio = extraerVideoID(urlPropia);
+            const idCompetencia = extraerVideoID(urlCompetencia);
+
+            if (!idPropio || !idCompetencia) {
+                alert("Verifica los enlaces de YouTube. No se pudieron procesar los IDs de video.");
+                return;
+            }
+
+            // Simular carga de análisis del Centro de Comando
+            const loading = document.getElementById('loading-status');
+            const panel = document.getElementById('panel-resultados');
+            
+            panel.style.display = 'none';
+            loading.style.display = 'block';
+
+            setTimeout(() => {
+                // Inyectar imágenes reales de las portadas usando los servidores de imágenes de YouTube
+                document.getElementById('img-propia').src = `https://img.youtube.com/vi/${idPropio}/maxresdefault.jpg`;
+                document.getElementById('img-competencia').src = `https://img.youtube.com/vi/${idCompetencia}/maxresdefault.jpg`;
+
+                // Títulos simulados de muestra para el mockup visual
+                document.getElementById('txt-titulo-propio').innerText = "Video Auditado ID: " + idPropio + " — Analizando Retención";
+                document.getElementById('txt-titulo-competencia').innerText = "Video Rival ID: " + idCompetencia + " — Éxito Viral Detectado";
+
+                // Mostrar panel final
+                loading.style.display = 'none';
+                panel.style.display = 'grid';
+            }, 1500); // Retraso de 1.5 segundos para emular procesamiento de IA
+        }
+    </script>
+</body>
+</html>
